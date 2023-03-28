@@ -131,6 +131,8 @@ class ZLClipImageViewController: UIViewController {
 
     var cancelClipBlock: (() -> Void)?
 
+    let imageSizeToSmall: () -> Void
+
     override var prefersStatusBarHidden: Bool {
         return true
     }
@@ -144,7 +146,7 @@ class ZLClipImageViewController: UIViewController {
         self.cleanTimer()
     }
 
-    init(image: UIImage, editRect: CGRect?, angle: CGFloat = 0, selectRatio: ZLImageClipRatio?) {
+    init(image: UIImage, editRect: CGRect?, angle: CGFloat = 0, selectRatio: ZLImageClipRatio?, imageSizeToSmall: @escaping () -> Void) {
         originalImage = image
         clipRatios = ZLImageEditorConfiguration.default().clipRatios
         self.editRect = editRect ?? .zero
@@ -165,6 +167,7 @@ class ZLClipImageViewController: UIViewController {
             firstEnter = true
             selectedRatio = ZLImageEditorConfiguration.default().clipRatios.first!
         }
+        self.imageSizeToSmall = imageSizeToSmall
         super.init(nibName: nil, bundle: nil)
         if firstEnter {
             calculateClipRect()
@@ -527,8 +530,12 @@ class ZLClipImageViewController: UIViewController {
 
     @objc func doneBtnClick() {
         let image = clipImage()
-        // MARK: 여기서 제한 어떻게 풀어주지...?
-        guard image.clipImage.size.width > 300 && image.clipImage.size.width > 300 else { return }
+        guard
+            image.clipImage.size.width > 300 && image.clipImage.size.width > 300
+        else {
+            imageSizeToSmall()
+            return
+        }
         dismissAnimateFromRect = clipBoxFrame
         dismissAnimateImage = image.clipImage
         clipDoneBlock?(angle, image.editRect, selectedRatio)

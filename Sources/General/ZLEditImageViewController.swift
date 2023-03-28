@@ -295,6 +295,7 @@ open class ZLEditImageViewController: UIViewController {
     var hasAdjustedImage = false
 
     @objc public var editFinishBlock: ((UIImage, ZLEditImageModel?) -> Void)?
+    let imageSizeToSmall: () -> Void
 
     override open var prefersStatusBarHidden: Bool {
         return true
@@ -314,11 +315,18 @@ open class ZLEditImageViewController: UIViewController {
         animate: Bool = true,
         image: UIImage,
         editModel: ZLEditImageModel? = nil,
+        imageSizeToSmall: @escaping () -> Void,
         completion: ((UIImage, ZLEditImageModel?) -> Void)?
     ) {
         let tools = ZLImageEditorConfiguration.default().tools
         if ZLImageEditorConfiguration.default().showClipDirectlyIfOnlyHasClipTool, tools.count == 1, tools.contains(.clip) {
-            let vc = ZLClipImageViewController(image: image, editRect: editModel?.editRect, angle: editModel?.angle ?? 0, selectRatio: editModel?.selectRatio)
+            let vc = ZLClipImageViewController(
+                image: image,
+                editRect: editModel?.editRect,
+                angle: editModel?.angle ?? 0,
+                selectRatio: editModel?.selectRatio,
+                imageSizeToSmall: imageSizeToSmall
+            )
             vc.clipDoneBlock = { angle, editRect, ratio in
                 let m = ZLEditImageModel(drawPaths: [], mosaicPaths: [], editRect: editRect, angle: angle, brightness: 0, contrast: 0, saturation: 0, selectRatio: ratio, selectFilter: .normal, textStickers: nil, imageStickers: nil)
                 completion?(image.zl.clipImage(angle: angle, editRect: editRect, isCircle: ratio.isCircle) ?? image, m)
@@ -327,7 +335,7 @@ open class ZLEditImageViewController: UIViewController {
             vc.modalPresentationStyle = .fullScreen
             parentVC?.present(vc, animated: animate, completion: nil)
         } else {
-            let vc = ZLEditImageViewController(image: image, editModel: editModel)
+            let vc = ZLEditImageViewController(image: image, editModel: editModel, imageSizeToSmall: imageSizeToSmall)
             vc.editFinishBlock = { ei, editImageModel in
                 completion?(ei, editImageModel)
             }
@@ -337,7 +345,7 @@ open class ZLEditImageViewController: UIViewController {
         }
     }
 
-    @objc public init(image: UIImage, editModel: ZLEditImageModel? = nil) {
+    @objc public init(image: UIImage, editModel: ZLEditImageModel? = nil, imageSizeToSmall: @escaping () -> Void) {
         originalImage = image.zl.fixOrientation()
         editImage = originalImage
         editImageWithoutAdjust = originalImage
@@ -361,6 +369,7 @@ open class ZLEditImageViewController: UIViewController {
         tools = ts
         adjustTools = ZLImageEditorConfiguration.default().adjustTools
         selectedAdjustTool = adjustTools.first
+        self.imageSizeToSmall = imageSizeToSmall
 
         super.init(nibName: nil, bundle: nil)
 
@@ -782,7 +791,7 @@ open class ZLEditImageViewController: UIViewController {
             currentEditImage = buildImage()
         }
 
-        let vc = ZLClipImageViewController(image: currentEditImage, editRect: editRect, angle: angle, selectRatio: selectRatio)
+        let vc = ZLClipImageViewController(image: currentEditImage, editRect: editRect, angle: angle, selectRatio: selectRatio, imageSizeToSmall: imageSizeToSmall)
         let rect = mainScrollView.convert(containerView.frame, to: view)
         vc.presentAnimateFrame = rect
         vc.presentAnimateImage = currentEditImage.zl.clipImage(angle: angle, editRect: editRect, isCircle: selectRatio?.isCircle ?? false)
