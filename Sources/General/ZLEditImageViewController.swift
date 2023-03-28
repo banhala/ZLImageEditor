@@ -80,7 +80,7 @@ open class ZLEditImageViewController: UIViewController {
 
     public var adjustColViewH: CGFloat = 60
 
-    public var ashbinSize = CGSize(width: 160, height: 80)
+    public var ashbinSize = CGSize(width: 140, height: 140)
 
     open lazy var mainScrollView: UIScrollView = {
         let view = UIScrollView()
@@ -671,14 +671,19 @@ open class ZLEditImageViewController: UIViewController {
         view.addSubview(ashbinView)
         ashbinView.addSubview(ashbinImgView)
 
-//        let asbinTipLabel = UILabel(frame: CGRect(x: 0, y: ashbinSize.height - 34, width: ashbinSize.width, height: 34))
-//        asbinTipLabel.font = UIFont.systemFont(ofSize: 12)
-//        asbinTipLabel.textAlignment = .center
-//        asbinTipLabel.textColor = .white
-////        asbinTipLabel.text = localLanguageTextValue(.textStickerRemoveTips)
-//        asbinTipLabel.numberOfLines = 2
-//        asbinTipLabel.lineBreakMode = .byCharWrapping
-//        ashbinView.addSubview(asbinTipLabel)
+        let asbinTipLabel = UILabel()
+        asbinTipLabel.font = UIFont.systemFont(ofSize: 12)
+        asbinTipLabel.textAlignment = .center
+        asbinTipLabel.textColor = .white
+        asbinTipLabel.text = localLanguageTextValue(.textStickerRemoveTips)
+        asbinTipLabel.numberOfLines = 2
+        asbinTipLabel.lineBreakMode = .byCharWrapping
+        ashbinView.addSubview(asbinTipLabel)
+        asbinTipLabel.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            asbinTipLabel.topAnchor.constraint(equalTo: ashbinImgView.bottomAnchor, constant: 8),
+            asbinTipLabel.centerXAnchor.constraint(equalTo: ashbinView.centerXAnchor)
+        ])
 
         if tools.contains(.mosaic) {
             mosaicImage = editImage.zl.mosaicImage()
@@ -1121,7 +1126,13 @@ open class ZLEditImageViewController: UIViewController {
     func setToolView(show: Bool, delay: TimeInterval? = nil) {
         cleanToolViewStateTimer()
         if let delay = delay {
-            toolViewStateTimer = Timer.scheduledTimer(timeInterval: delay, target: ZLWeakProxy(target: self), selector: #selector(setToolViewShow_timerFunc(show:)), userInfo: ["show": show], repeats: false)
+            toolViewStateTimer = Timer.scheduledTimer(
+                timeInterval: delay,
+                target: ZLWeakProxy(target: self),
+                selector: #selector(setToolViewShow_timerFunc(show:)),
+                userInfo: ["show": show],
+                repeats: false
+            )
             RunLoop.current.add(toolViewStateTimer!, forMode: .common)
         } else {
             setToolViewShow_timerFunc(show: show)
@@ -1631,6 +1642,9 @@ extension ZLEditImageViewController: ZLStickerViewDelegate {
         if ashbinView.frame.contains(point) {
             ashbinView.backgroundColor = .zl.ashbinTintBgColor
             ashbinImgView.isHighlighted = true
+            UIView.animate(withDuration: 0.25) {
+                self.ashbinView.transform = CGAffineTransform(scaleX: 1.5, y: 1.5)
+            }
             if sticker.alpha == 1 {
                 sticker.layer.removeAllAnimations()
                 UIView.animate(withDuration: 0.25) {
@@ -1640,6 +1654,9 @@ extension ZLEditImageViewController: ZLStickerViewDelegate {
         } else {
             ashbinView.backgroundColor = .zl.ashbinNormalBgColor
             ashbinImgView.isHighlighted = false
+            UIView.animate(withDuration: 0.25) {
+                self.ashbinView.transform = .identity
+            }
             if sticker.alpha != 1 {
                 sticker.layer.removeAllAnimations()
                 UIView.animate(withDuration: 0.25) {
