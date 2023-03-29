@@ -32,25 +32,25 @@ class ZLEditToolCell: UICollectionViewCell {
             switch toolType {
             case .draw:
                 icon.image = getImage("zl_drawLine")
-                icon.highlightedImage = getImage("zl_drawLine_selected")
+                icon.highlightedImage = getImage("zl_drawLine_selected")?.withRenderingMode(.alwaysTemplate)
             case .clip:
                 icon.image = getImage("zl_clip")
-                icon.highlightedImage = getImage("zl_clip")
+                icon.highlightedImage = getImage("zl_clip")?.withRenderingMode(.alwaysTemplate)
             case .imageSticker:
                 icon.image = getImage("zl_imageSticker")
-                icon.highlightedImage = getImage("zl_imageSticker")
+                icon.highlightedImage = getImage("zl_imageSticker")?.withRenderingMode(.alwaysTemplate)
             case .textSticker:
                 icon.image = getImage("zl_textSticker")
-                icon.highlightedImage = getImage("zl_textSticker")
+                icon.highlightedImage = getImage("zl_textSticker")?.withRenderingMode(.alwaysTemplate)
             case .mosaic:
                 icon.image = getImage("zl_mosaic")
-                icon.highlightedImage = getImage("zl_mosaic_selected")
+                icon.highlightedImage = getImage("zl_mosaic_selected")?.withRenderingMode(.alwaysTemplate)
             case .filter:
                 icon.image = getImage("zl_filter")
-                icon.highlightedImage = getImage("zl_filter_selected")
+                icon.highlightedImage = getImage("zl_filter_selected")?.withRenderingMode(.alwaysTemplate)
             case .adjust:
                 icon.image = getImage("zl_adjust")
-                icon.highlightedImage = getImage("zl_adjust_selected")
+                icon.highlightedImage = getImage("zl_adjust_selected")?.withRenderingMode(.alwaysTemplate)
             }
             if let color = UIColor.zl.toolIconHighlightedColor {
                 icon.highlightedImage = icon.highlightedImage?
@@ -65,6 +65,7 @@ class ZLEditToolCell: UICollectionViewCell {
         super.init(frame: frame)
         
         icon = UIImageView(frame: contentView.bounds)
+        icon.tintColor = .zl.editDoneBtnBgColor
         contentView.addSubview(icon)
     }
     
@@ -157,15 +158,15 @@ class ZLAdjustToolCell: UICollectionViewCell {
             switch adjustTool {
             case .brightness:
                 imageView.image = getImage("zl_brightness")
-                imageView.highlightedImage = getImage("zl_brightness_selected")
+                imageView.highlightedImage = getImage("zl_brightness_selected")?.withRenderingMode(.alwaysTemplate)
                 nameLabel.text = localLanguageTextValue(.brightness)
             case .contrast:
                 imageView.image = getImage("zl_contrast")
-                imageView.highlightedImage = getImage("zl_contrast_selected")
+                imageView.highlightedImage = getImage("zl_contrast_selected")?.withRenderingMode(.alwaysTemplate)
                 nameLabel.text = localLanguageTextValue(.contrast)
             case .saturation:
                 imageView.image = getImage("zl_saturation")
-                imageView.highlightedImage = getImage("zl_saturation_selected")
+                imageView.highlightedImage = getImage("zl_saturation_selected")?.withRenderingMode(.alwaysTemplate)
                 nameLabel.text = localLanguageTextValue(.saturation)
             }
             if let color = UIColor.zl.toolIconHighlightedColor {
@@ -194,6 +195,7 @@ class ZLAdjustToolCell: UICollectionViewCell {
         imageView.frame = CGRect(x: (bounds.width - 30) / 2, y: 0, width: 30, height: 30)
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
+        imageView.tintColor = .zl.editDoneBtnBgColor
         contentView.addSubview(imageView)
     }
     
