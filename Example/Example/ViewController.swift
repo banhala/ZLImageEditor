@@ -300,12 +300,21 @@ class ViewController: UIViewController {
     }
     
     func editImage(_ image: UIImage, editModel: ZLEditImageModel?) {
-        ZLEditImageViewController.showEditImageVC(parentVC: self, image: image, editModel: editModel, imageSizeToSmall: {
-            print("cliped image to small")
-        }) { [weak self] (resImage, editModel) in
-            self?.resultImageView.image = resImage
-            self?.resultImageEditModel = editModel
-        }
+        ZLEditImageViewController.showEditImageVC(
+            parentVC: self,
+            image: image,
+            editModel: editModel,
+            imageSizeToSmall: {
+                print("cliped image to small")
+            },
+            completion: { [weak self] (resImage, editModel) in
+                self?.resultImageView.image = resImage
+                self?.resultImageEditModel = editModel
+            },
+            cancelCompletion: {
+                print("didTapCancel")
+            }
+        )
     }
 
 }
