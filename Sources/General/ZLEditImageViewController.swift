@@ -295,6 +295,7 @@ open class ZLEditImageViewController: UIViewController {
     var hasAdjustedImage = false
 
     @objc public var editFinishBlock: ((UIImage, ZLEditImageModel?) -> Void)?
+    @objc public var cancelBlock: (() -> Void)?
     let imageSizeToSmall: () -> Void
 
     override open var prefersStatusBarHidden: Bool {
@@ -316,7 +317,8 @@ open class ZLEditImageViewController: UIViewController {
         image: UIImage,
         editModel: ZLEditImageModel? = nil,
         imageSizeToSmall: @escaping () -> Void,
-        completion: ((UIImage, ZLEditImageModel?) -> Void)?
+        completion: ((UIImage, ZLEditImageModel?) -> Void)?,
+        cancelCompletion: (() -> Void)?
     ) {
         let tools = ZLImageEditorConfiguration.default().tools
         if ZLImageEditorConfiguration.default().showClipDirectlyIfOnlyHasClipTool, tools.count == 1, tools.contains(.clip) {
@@ -332,6 +334,7 @@ open class ZLEditImageViewController: UIViewController {
                 completion?(image.zl.clipImage(angle: angle, editRect: editRect, isCircle: ratio.isCircle) ?? image, m)
             }
             vc.animateDismiss = animate
+            vc.cancelClipBlock = cancelCompletion
             vc.modalPresentationStyle = .fullScreen
             parentVC?.present(vc, animated: animate, completion: nil)
         } else {
@@ -339,6 +342,7 @@ open class ZLEditImageViewController: UIViewController {
             vc.editFinishBlock = { ei, editImageModel in
                 completion?(ei, editImageModel)
             }
+            vc.cancelBlock = cancelCompletion
             vc.animateDismiss = animate
             vc.modalPresentationStyle = .fullScreen
             parentVC?.present(vc, animated: animate, completion: nil)
@@ -765,7 +769,7 @@ open class ZLEditImageViewController: UIViewController {
     }
 
     @objc func cancelBtnClick() {
-        dismiss(animated: animateDismiss, completion: nil)
+        dismiss(animated: animateDismiss, completion: cancelBtnClick)
     }
 
     func drawBtnClick() {
